@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes Narsisme NPI-16</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .question-number {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option:hover {
+            background-color: #f1f8ff;
+            border-color: #3498db;
+        }
+
+        .option.selected {
+            background-color: #e1f5fe;
+            border-color: #0288d1;
+        }
+
+        .option input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+        }
+
+        .interpretation {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #e8f4fd;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .option {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tes Narsisme NPI-16</h1>
+            <p class="description">Narcissistic Personality Inventory - Versi 16 Item</p>
+        </header>
+
+        <div class="instructions">
+            <p><strong>Petunjuk:</strong> Untuk setiap pasangan pernyataan di bawah ini, pilih satu pernyataan yang paling mencerminkan diri Anda. Tidak ada jawaban benar atau salah.</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div id="questions-container">
+            <!-- Pertanyaan akan dimasukkan di sini oleh JavaScript -->
+        </div>
+
+        <div class="button-container">
+            <button id="submit-btn">Lihat Hasil Tes</button>
+        </div>
+
+        <div class="result-container" id="result-container">
+            <h2>Hasil Tes Narsisme Anda</h2>
+            <div class="score" id="score">0</div>
+            <p>Skor Anda: <span id="score-text">0</span> dari 16</p>
+            
+            <div class="interpretation" id="interpretation">
+                <!-- Interpretasi hasil akan dimasukkan di sini -->
+            </div>
+            
+            <div class="button-container" style="margin-top: 20px;">
+                <button id="restart-btn">Ulangi Tes</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Alat ukur ini didasarkan pada Narcissistic Personality Inventory-16 (NPI-16) oleh Ames, Rose, & Anderson (2006).</p>
+            <p>Digunakan untuk tujuan penelitian non-komersial tanpa perlu izin tertulis.</p>
+        </div>
+    </div>
+
+    <script>
+        // Data pertanyaan NPI-16
+        const questions = [
+            {
+                id: 1,
+                optionA: "Saya tahu saya baik karena semua orang terus memberitahuku",
+                optionB: "Saat orang memujiku, saya kadang merasa malu"
+            },
+            {
+                id: 2,
+                optionA: "Saya suka menjadi pusat perhatian",
+                optionB: "Saya lebih suka menyatu dengan kerumunan"
+            },
+            {
+                id: 3,
+                optionA: "Saya pikir saya adalah orang yang spesial",
+                optionB: "Saya tidak lebih baik atau lebih buruk dari kebanyakan orang"
+            },
+            {
+                id: 4,
+                optionA: "Saya suka memiliki wewenang atas orang lain",
+                optionB: "Saya tidak keberatan mengikuti perintah"
+            },
+            {
+                id: 5,
+                optionA: "Saya merasa mudah memanipulasi orang",
+                optionB: "Saya tidak suka ketika saya merasa sendiri memanipulasi orang"
+            },
+            {
+                id: 6,
+                optionA: "Saya bersikeras untuk mendapatkan rasa hormat yang layak saya terima",
+                optionB: "Saya biasanya mendapat rasa hormat yang layak saya terima"
+            },
+            {
+                id: 7,
+                optionA: "Saya cenderung pamer jika ada kesempatan",
+                optionB: "Saya berusaha untuk tidak pamer"
+            },
+            {
+                id: 8,
+                optionA: "Saya selalu tahu apa yang saya lakukan",
+                optionB: "Terkadang saya tidak yakin dengan apa yang saya lakukan"
+            },
+            {
+                id: 9,
+                optionA: "Semua orang suka mendengar cerita-cerita saya",
+                optionB: "Terkadang saya menceritakan kisah yang bagus"
+            },
+            {
+                id: 10,
+                optionA: "Saya mengharapkan banyak dari orang lain",
+                optionB: "Saya suka melakukan hal-hal untuk orang lain"
+            },
+            {
+                id: 11,
+                optionA: "Saya sangat suka menjadi pusat perhatian",
+                optionB: "Saya merasa tidak nyaman menjadi pusat perhatian"
+            },
+            {
+                id: 12,
+                optionA: "Orang-orang selalu tampak mengakui kewibawaan saya",
+                optionB: "Menjadi pemimpin tidak berarti banyak bagi saya"
+            },
+            {
+                id: 13,
+                optionA: "Saya akan menjadi orang yang hebat",
+                optionB: "Saya harap saya akan menjadi sukses"
+            },
+            {
+                id: 14,
+                optionA: "Saya bisa membuat siapa pun mempercayai apa pun yang saya inginkan",
+                optionB: "Orang terkadang percaya pada apa yang saya katakan"
+            },
+            {
+                id: 15,
+                optionA: "Saya lebih mampu daripada orang lain",
+                optionB: "Ada banyak yang bisa saya pelajari dari orang lain"
+            },
+            {
+                id: 16,
+                optionA: "Saya adalah orang yang luar biasa",
+                optionB: "Saya sama seperti orang lain pada umumnya"
+            }
+        ];
+
+        // Inisialisasi variabel
+        let userAnswers = Array(questions.length).fill(null);
+        let currentQuestion = 0;
+
+        // Fungsi untuk menampilkan pertanyaan
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                
+                questionDiv.innerHTML = `
+                    <div class="question-number">Pertanyaan ${index + 1}</div>
+                    <div class="options">
+                        <div class="option ${userAnswers[index] === 'A' ? 'selected' : ''}" data-question="${index}" data-option="A">
+                            <input type="radio" name="question-${index}" id="q${index}-a" ${userAnswers[index] === 'A' ? 'checked' : ''}>
+                            <label for="q${index}-a">${question.optionA}</label>
+                        </div>
+                        <div class="option ${userAnswers[index] === 'B' ? 'selected' : ''}" data-question="${index}" data-option="B">
+                            <input type="radio" name="question-${index}" id="q${index}-b" ${userAnswers[index] === 'B' ? 'checked' : ''}>
+                            <label for="q${index}-b">${question.optionB}</label>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(questionDiv);
+            });
+            
+            // Tambahkan event listener untuk pilihan
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const questionIndex = parseInt(this.getAttribute('data-question'));
+                    const selectedOption = this.getAttribute('data-option');
+                    
+                    // Hapus seleksi sebelumnya untuk pertanyaan ini
+                    document.querySelectorAll(`.option[data-question="${questionIndex}"]`).forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Tandai pilihan yang dipilih
+                    this.classList.add('selected');
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Simpan jawaban
+                    userAnswers[questionIndex] = selectedOption;
+                    
+                    // Update progress bar
+                    updateProgressBar();
+                });
+            });
+        }
+
+        // Fungsi untuk memperbarui progress bar
+        function updateProgressBar() {
+            const answeredCount = userAnswers.filter(answer => answer !== null).length;
+            const progressPercent = (answeredCount / questions.length) * 100;
+            document.getElementById('progress').style.width = `${progressPercent}%`;
+        }
+
+        // Fungsi untuk menghitung skor
+        function calculateScore() {
+            let score = 0;
+            userAnswers.forEach(answer => {
+                if (answer === 'A') { // Opsi A adalah jawaban narsistik
+                    score++;
+                }
+            });
+            return score;
+        }
+
+        // Fungsi untuk menampilkan hasil
+        function showResults() {
+            const score = calculateScore();
+            const scoreElement = document.getElementById('score');
+            const scoreTextElement = document.getElementById('score-text');
+            const interpretationElement = document.getElementById('interpretation');
+            
+            // Animate score counter
+            let counter = 0;
+            const interval = setInterval(() => {
+                if (counter <= score) {
+                    scoreElement.textContent = counter;
+                    scoreTextElement.textContent = counter;
+                    counter++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 50);
+            
+            // Tampilkan interpretasi berdasarkan skor
+            let interpretation = '';
+            if (score <= 5) {
+                interpretation = `
+                    <h3>Tingkat Narsisme: Rendah</h3>
+                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang rendah. Anda cenderung memiliki pandangan yang realistis tentang diri sendiri dan tidak terlalu membutuhkan pengakuan atau perhatian dari orang lain.</p>
+                `;
+            } else if (score <= 10) {
+                interpretation = `
+                    <h3>Tingkat Narsisme: Sedang</h3>
+                    <p>Skor Anda berada dalam rentang rata-rata. Seperti kebanyakan orang, Anda memiliki beberapa sifat narsistik tetapi tidak berlebihan. Anda mungkin memiliki kepercayaan diri yang sehat tanpa mengorbankan empati terhadap orang lain.</p>
+                `;
+            } else {
+                interpretation = `
+                    <h3>Tingkat Narsisme: Tinggi</h3>
+                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang tinggi. Anda mungkin memiliki kecenderungan untuk merasa lebih istimewa daripada orang lain, membutuhkan banyak pengakuan, dan memiliki kepercayaan diri yang tinggi. Perlu diingat bahwa ini adalah alat ukur untuk penelitian dan bukan diagnosis klinis.</p>
+                `;
+            }
+            
+            interpretationElement.innerHTML = interpretation;
+            
+            // Tampilkan container hasil
+            document.getElementById('result-container').style.display = 'block';
+            
+            // Scroll ke hasil
+            document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Event listener untuk tombol submit
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const unanswered = userAnswers.filter(answer => answer === null).length;
+            
+            if (unanswered > 0) {
+                alert(`Anda belum menjawab ${unanswered} pertanyaan. Silakan lengkapi semua pertanyaan sebelum melihat hasil.`);
+                return;
+            }
+            
+            showResults();
+        });
+
+        // Event listener untuk tombol restart
+        document.getElementById('restart-btn').addEventListener('click', function() {
+            userAnswers = Array(questions.length).fill(null);
+            renderQuestions();
+            updateProgressBar();
+            document.getElementById('result-container').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Inisialisasi aplikasi
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuestions();
+            updateProgressBar();
+        });
+    </script>
+</body>
+</html>
