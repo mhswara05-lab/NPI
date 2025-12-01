@@ -63,6 +63,12 @@
             border-radius: 8px;
             margin-bottom: 15px;
             border-left: 4px solid #2ecc71;
+            scroll-margin-top: 20px; /* Untuk smooth scroll */
+        }
+
+        .question.unanswered {
+            border-left-color: #e74c3c;
+            background-color: #fdedec;
         }
 
         .question-number {
@@ -140,6 +146,36 @@
             margin: 20px 0;
         }
 
+        .score-scale {
+            width: 80%;
+            height: 30px;
+            background: linear-gradient(to right, #2ecc71, #f1c40f, #e74c3c);
+            border-radius: 15px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .score-marker {
+            position: absolute;
+            top: -5px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid #2c3e50;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            margin: 0 auto;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
         .interpretation {
             margin-top: 20px;
             padding: 15px;
@@ -169,6 +205,17 @@
             transition: width 0.3s;
         }
 
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -176,6 +223,14 @@
             
             .option {
                 padding: 10px;
+            }
+            
+            .score-scale {
+                width: 95%;
+            }
+            
+            .scale-labels {
+                width: 95%;
             }
         }
     </style>
@@ -206,7 +261,17 @@
         <div class="result-container" id="result-container">
             <h2>Hasil Tes Narsisme Anda</h2>
             <div class="score" id="score">0</div>
-            <p>Skor Anda: <span id="score-text">0</span> dari 16</p>
+            <p>Skor Anda: <span id="score-text">0</span>/100</p>
+            
+            <div class="score-scale" id="score-scale">
+                <div class="score-marker" id="score-marker"></div>
+            </div>
+            
+            <div class="scale-labels">
+                <span>Rendah</span>
+                <span>Sedang</span>
+                <span>Tinggi</span>
+            </div>
             
             <div class="interpretation" id="interpretation">
                 <!-- Interpretasi hasil akan dimasukkan di sini -->
@@ -319,7 +384,8 @@
             
             questions.forEach((question, index) => {
                 const questionDiv = document.createElement('div');
-                questionDiv.className = 'question';
+                questionDiv.className = `question ${userAnswers[index] === null ? 'unanswered' : ''}`;
+                questionDiv.id = `question-${index}`;
                 
                 questionDiv.innerHTML = `
                     <div class="question-number">Pertanyaan ${index + 1}</div>
@@ -332,6 +398,10 @@
                             <input type="radio" name="question-${index}" id="q${index}-b" ${userAnswers[index] === 'B' ? 'checked' : ''}>
                             <label for="q${index}-b">${question.optionB}</label>
                         </div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button class="nav-btn" onclick="scrollToQuestion(${index - 1})" ${index === 0 ? 'disabled' : ''}>Sebelumnya</button>
+                        <button class="nav-btn" onclick="scrollToQuestion(${index + 1})" ${index === questions.length - 1 ? 'disabled' : ''}>Berikutnya</button>
                     </div>
                 `;
                 
@@ -359,8 +429,28 @@
                     
                     // Update progress bar
                     updateProgressBar();
+                    
+                    // Hapus kelas unanswered
+                    document.getElementById(`question-${questionIndex}`).classList.remove('unanswered');
+                    
+                    // Auto scroll ke pertanyaan berikutnya setelah 500ms
+                    setTimeout(() => {
+                        if (questionIndex < questions.length - 1) {
+                            scrollToQuestion(questionIndex + 1);
+                        }
+                    }, 500);
                 });
             });
+        }
+
+        // Fungsi untuk scroll ke pertanyaan tertentu
+        function scrollToQuestion(index) {
+            if (index >= 0 && index < questions.length) {
+                const questionElement = document.getElementById(`question-${index}`);
+                if (questionElement) {
+                    questionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
         }
 
         // Fungsi untuk memperbarui progress bar
@@ -370,7 +460,7 @@
             document.getElementById('progress').style.width = `${progressPercent}%`;
         }
 
-        // Fungsi untuk menghitung skor
+        // Fungsi untuk menghitung skor dalam skala 0-100
         function calculateScore() {
             let score = 0;
             userAnswers.forEach(answer => {
@@ -378,7 +468,8 @@
                     score++;
                 }
             });
-            return score;
+            // Konversi ke skala 0-100
+            return Math.round((score / 16) * 100);
         }
 
         // Fungsi untuk menampilkan hasil
@@ -387,6 +478,10 @@
             const scoreElement = document.getElementById('score');
             const scoreTextElement = document.getElementById('score-text');
             const interpretationElement = document.getElementById('interpretation');
+            const scoreMarker = document.getElementById('score-marker');
+            
+            // Posisikan marker pada skala
+            scoreMarker.style.left = `${score}%`;
             
             // Animate score counter
             let counter = 0;
@@ -398,24 +493,24 @@
                 } else {
                     clearInterval(interval);
                 }
-            }, 50);
+            }, 20);
             
             // Tampilkan interpretasi berdasarkan skor
             let interpretation = '';
-            if (score <= 5) {
+            if (score <= 33) {
                 interpretation = `
                     <h3>Tingkat Narsisme: Rendah</h3>
-                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang rendah. Anda cenderung memiliki pandangan yang realistis tentang diri sendiri dan tidak terlalu membutuhkan pengakuan atau perhatian dari orang lain.</p>
+                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang rendah (${score}/100). Anda cenderung memiliki pandangan yang realistis tentang diri sendiri dan tidak terlalu membutuhkan pengakuan atau perhatian dari orang lain. Ini menunjukkan tingkat kerendahan hati dan empati yang baik.</p>
                 `;
-            } else if (score <= 10) {
+            } else if (score <= 66) {
                 interpretation = `
                     <h3>Tingkat Narsisme: Sedang</h3>
-                    <p>Skor Anda berada dalam rentang rata-rata. Seperti kebanyakan orang, Anda memiliki beberapa sifat narsistik tetapi tidak berlebihan. Anda mungkin memiliki kepercayaan diri yang sehat tanpa mengorbankan empati terhadap orang lain.</p>
+                    <p>Skor Anda berada dalam rentang rata-rata (${score}/100). Seperti kebanyakan orang, Anda memiliki beberapa sifat narsistik tetapi tidak berlebihan. Anda mungkin memiliki kepercayaan diri yang sehat tanpa mengorbankan empati terhadap orang lain.</p>
                 `;
             } else {
                 interpretation = `
                     <h3>Tingkat Narsisme: Tinggi</h3>
-                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang tinggi. Anda mungkin memiliki kecenderungan untuk merasa lebih istimewa daripada orang lain, membutuhkan banyak pengakuan, dan memiliki kepercayaan diri yang tinggi. Perlu diingat bahwa ini adalah alat ukur untuk penelitian dan bukan diagnosis klinis.</p>
+                    <p>Skor Anda menunjukkan tingkat sifat narsistik yang tinggi (${score}/100). Anda mungkin memiliki kecenderungan untuk merasa lebih istimewa daripada orang lain, membutuhkan banyak pengakuan, dan memiliki kepercayaan diri yang tinggi. Perlu diingat bahwa ini adalah alat ukur untuk penelitian dan bukan diagnosis klinis.</p>
                 `;
             }
             
@@ -428,12 +523,23 @@
             document.getElementById('result-container').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Fungsi untuk scroll ke pertanyaan yang belum dijawab
+        function scrollToFirstUnanswered() {
+            const firstUnansweredIndex = userAnswers.findIndex(answer => answer === null);
+            if (firstUnansweredIndex !== -1) {
+                scrollToQuestion(firstUnansweredIndex);
+                return true;
+            }
+            return false;
+        }
+
         // Event listener untuk tombol submit
         document.getElementById('submit-btn').addEventListener('click', function() {
             const unanswered = userAnswers.filter(answer => answer === null).length;
             
             if (unanswered > 0) {
-                alert(`Anda belum menjawab ${unanswered} pertanyaan. Silakan lengkapi semua pertanyaan sebelum melihat hasil.`);
+                alert(`Anda belum menjawab ${unanswered} pertanyaan. Akan diarahkan ke pertanyaan pertama yang belum dijawab.`);
+                scrollToFirstUnanswered();
                 return;
             }
             
